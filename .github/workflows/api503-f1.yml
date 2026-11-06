@@ -1,0 +1,26 @@
+# Copy into the separate control repository as .github/workflows/api503-f1.yml after approval.
+name: API503 F1 hosted runner feasibility
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: api503-f1-feasibility
+  cancel-in-progress: false
+
+jobs:
+  inventory:
+    if: github.event_name == 'workflow_dispatch' && github.run_attempt == 1 && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-24.04
+    environment: api503-f1-review
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Passive feasibility inventory
+        shell: bash
+        run: node f1-preflight.mjs
